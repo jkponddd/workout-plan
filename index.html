@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>โปรแกรมฝึก 6 วัน — สร้างกล้าม ลดไขมัน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0E1512;
+    --bg-alt: #131C18;
+    --card: #17211C;
+    --card-line: #263129;
+    --ink: #EDEDE6;
+    --ink-dim: #9CA79E;
+    --gold: #E3A63E;
+    --gold-ink: #1b1408;
+    --gold-dim: rgba(227,166,62,.16);
+    --red: #E1543F;
+    --teal: #4CA88A;
+    --blue: #4C8DA8;
+    --violet: #9B7FE0;
+    --green: #4CAF6B;
+    --pink: #E6659C;
+    --orange: #E8793E;
+    --chip-bg: rgba(255,255,255,0.05);
+    --radius: 16px;
+    color-scheme: dark;
+  }
+  html[data-theme="light"]{
+    --bg: #FAF7F0;
+    --bg-alt: #F1EBDC;
+    --card: #FFFFFF;
+    --card-line: #E4DCC8;
+    --ink: #241E12;
+    --ink-dim: #6E6552;
+    --gold: #B5791E;
+    --gold-ink: #FFF9EE;
+    --gold-dim: rgba(181,121,30,.12);
+    --red: #C4462F;
+    --teal: #2E8A6C;
+    --blue: #2E6E8A;
+    --violet: #7A5EC7;
+    --green: #2E8B57;
+    --pink: #C23E78;
+    --orange: #C25A26;
+    --chip-bg: rgba(0,0,0,0.045);
+    color-scheme: light;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Sarabun',sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s;}
+  body{padding-bottom:calc(82px + env(safe-area-inset-bottom)); max-width:520px; margin:0 auto; position:relative;}
+  :focus-visible{outline:2px solid var(--gold); outline-offset:2px; border-radius:6px;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important; transition-duration:.01ms !important;}
+  }
+
+  /* top bar */
+  .app-top{
+    padding:16px 16px 14px;
+    background:
+      radial-gradient(120% 100% at 100% 0%, var(--gold-dim), transparent 55%),
+      linear-gradient(180deg, var(--bg-alt), var(--bg));
+    border-bottom:1px solid var(--card-line);
+    position:sticky; top:0; z-index:15;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+  }
+  .app-top h1{font-family:'Kanit',sans-serif; font-weight:800; font-size:18px; margin:0; line-height:1.2;}
+  .app-top .eyebrow{font-family:'Kanit',sans-serif; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:3px;}
+  .theme-btn{
+    flex:0 0 auto; width:38px; height:38px; border-radius:12px;
+    border:1px solid var(--card-line); background:var(--card); color:var(--ink);
+    font-size:16px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+
+  /* sections */
+  .section{display:none;}
+  .section.active{display:block; animation:secFade .18s ease;}
+  @keyframes secFade{from{opacity:0;} to{opacity:1;}}
+
+  /* profile input */
+  .profile{margin:14px 16px; padding:12px; border-radius:12px; background:var(--card); border:1px solid var(--card-line);}
+  .gender-toggle{display:flex; gap:6px; margin-bottom:10px;}
+  .gtab{
+    flex:1; font-family:'Kanit',sans-serif; font-size:12.5px; font-weight:600;
+    padding:9px 6px; border-radius:9px; border:1px solid var(--card-line);
+    background:var(--bg-alt); color:var(--ink-dim); cursor:pointer;
+  }
+  .gtab.active{background:var(--gold); color:var(--gold-ink); border-color:var(--gold);}
+  .profile-inputs{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+  .pfield{display:flex; flex-direction:column; gap:4px;}
+  .pfield span{font-size:9.5px; color:var(--ink-dim); font-family:'Kanit',sans-serif; letter-spacing:.03em;}
+  .pfield .iwrap{display:flex; align-items:baseline; gap:3px; background:var(--bg-alt); border:1px solid var(--card-line); border-radius:8px; padding:7px 8px;}
+  .pfield input{width:100%; border:none; background:none; color:var(--ink); font-family:'Kanit',sans-serif; font-size:14px; font-weight:600; -moz-appearance:textfield;}
+  .pfield input::-webkit-outer-spin-button, .pfield input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0;}
+  .pfield input:focus{outline:none;}
+  .pfield .unit{font-size:10px; color:var(--ink-dim); flex:0 0 auto;}
+
+  /* calc results */
+  .calc-card{margin:0 16px 14px; border-radius:var(--radius); border:1px solid var(--card-line); background:var(--card); overflow:hidden;}
+  .calc-title{padding:14px 16px 0; font-family:'Kanit',sans-serif; font-weight:700; font-size:14px;}
+  .calc-sub{padding:4px 16px 12px; font-size:11.5px; color:var(--ink-dim);}
+  .activity-pills{display:flex; gap:6px; padding:0 16px 12px; overflow-x:auto; scrollbar-width:none;}
+  .activity-pills::-webkit-scrollbar{display:none;}
+  .apill{
+    flex:0 0 auto; font-family:'Kanit',sans-serif; font-size:11.5px; font-weight:600;
+    padding:8px 12px; border-radius:20px; border:1px solid var(--card-line);
+    background:var(--bg-alt); color:var(--ink-dim); cursor:pointer; white-space:nowrap;
+  }
+  .apill.active{background:var(--gold); color:var(--gold-ink); border-color:var(--gold);}
+  .calc-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0 16px 16px;}
+  .calc-tile{background:var(--bg-alt); border:1px solid var(--card-line); border-radius:12px; padding:11px 12px;}
+  .calc-tile .ct-label{font-size:10.5px; color:var(--ink-dim); margin-bottom:4px;}
+  .calc-tile .ct-value{font-family:'Kanit',sans-serif; font-weight:700; font-size:16px; color:var(--ink);}
+  .calc-tile .ct-value small{font-family:'Sarabun',sans-serif; font-weight:500; font-size:11px; color:var(--ink-dim);}
+  .calc-tile.wide{grid-column:1 / -1;}
+  .bmi-tag{display:inline-block; margin-top:5px; font-family:'Kanit',sans-serif; font-size:10.5px; font-weight:600; padding:2px 8px; border-radius:999px; background:var(--gold-dim); color:var(--gold);}
+  .hr-title{padding:2px 16px 8px; font-family:'Kanit',sans-serif; font-weight:700; font-size:13px; color:var(--ink);}
+  .hr-zones{padding:0 16px 16px;}
+  .hz-row{display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--card-line); font-size:12px;}
+  .hz-row:last-child{border-bottom:none;}
+  .hz-name{color:var(--ink); font-weight:600;}
+  .hz-desc{color:var(--ink-dim); font-size:10.5px; display:block; margin-top:1px;}
+  .hz-range{font-family:'Kanit',sans-serif; font-weight:700; color:var(--gold); white-space:nowrap;}
+
+  /* day tabs */
+  .tabs{
+    display:flex; gap:6px; padding:14px 16px; overflow-x:auto;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    position:sticky; top:0; z-index:10; background:var(--bg);
+    border-bottom:1px solid var(--card-line);
+  }
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    flex:0 0 auto; font-family:'Kanit',sans-serif; font-size:12.5px; font-weight:600;
+    padding:10px 14px 10px 22px; border-radius:20px; border:1px solid var(--card-line);
+    color:var(--ink-dim); background:var(--card); white-space:nowrap; cursor:pointer;
+    position:relative; transition:background .15s, color .15s, border-color .15s;
+  }
+  .tab::before{content:''; position:absolute; left:11px; top:50%; transform:translateY(-50%); width:7px; height:7px; border-radius:50%; background:var(--accent); transition:background .15s;}
+  .tab .d{display:block; font-size:9.5px; font-weight:500; opacity:.75; margin-top:2px;}
+  .tab.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .tab.active::before{background:rgba(255,255,255,.85);}
+  .tab.tab-gold.active{color:var(--gold-ink);}
+  .tab.tab-gold.active::before{background:var(--gold-ink);}
+
+  .panel{display:none; padding:14px 16px 0;}
+  .panel.active{display:block; animation:fade .2s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  .day-card{border-radius:var(--radius); background:var(--card); border:1px solid var(--card-line); overflow:hidden; margin-bottom:14px;}
+  .day-head{padding:14px 16px 10px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; border-left:4px solid var(--accent, var(--gold));}
+  .day-name{font-family:'Kanit',sans-serif; font-weight:700; font-size:16px; margin:0 0 2px;}
+  .day-focus{font-size:12.5px; color:var(--ink-dim);}
+  .day-badge{
+    font-family:'Kanit',sans-serif; font-size:10.5px; font-weight:600;
+    padding:4px 9px; border-radius:999px; white-space:nowrap;
+    background:color-mix(in srgb, var(--accent, var(--gold)) 18%, transparent);
+    color:var(--accent, var(--gold));
+  }
+
+  .ex-list{padding:0 6px 6px;}
+  .ex-row{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+    padding:10px 10px; border-bottom:1px solid var(--card-line);
+    cursor:pointer; transition:background .1s; border-radius:10px;
+  }
+  .ex-row:last-child{border-bottom:none;}
+  .ex-row:active{background:var(--chip-bg);}
+  .ex-name{font-weight:600; font-size:13.5px; color:var(--ink); margin-bottom:2px;}
+  .ex-cue{color:var(--ink-dim); font-size:11.5px; line-height:1.45;}
+  .ex-meta{flex:0 0 auto; text-align:right; white-space:nowrap;}
+  .chip{
+    display:inline-block; font-family:'Kanit',sans-serif; font-size:11px; font-weight:700;
+    background:color-mix(in srgb, var(--accent, var(--gold)) 16%, var(--chip-bg));
+    border-radius:8px; padding:3px 7px; color:var(--accent, var(--gold));
+  }
+  .chip-rest{
+    display:block; margin-top:4px; font-family:'Sarabun',sans-serif; font-weight:500; font-size:10.5px;
+    color:var(--ink-dim); background:none; padding:3px 2px; border-radius:6px; cursor:pointer;
+  }
+  .chip-rest.tappable:active{background:var(--chip-bg);}
+
+  .day-note{margin:8px 16px 14px; padding:10px 12px; border-radius:10px; background:var(--gold-dim); border:1px dashed color-mix(in srgb, var(--gold) 50%, transparent); font-size:11.5px; color:var(--ink-dim); line-height:1.5;}
+
+  /* weekend toggle */
+  .toggle-bar{display:flex; gap:0; margin:0 16px 12px; border-radius:11px; overflow:hidden; border:1px solid var(--card-line); background:var(--bg);}
+  .toggle-btn{flex:1; padding:10px 6px; text-align:center; font-family:'Kanit',sans-serif; font-size:12px; font-weight:600; color:var(--ink-dim); background:none; border:none; cursor:pointer;}
+  .toggle-btn.active{background:var(--accent); color:#fff;}
+  .toggle-pane{display:none;}
+  .toggle-pane.active{display:block;}
+
+  .rest-box{margin:0 16px 16px; padding:14px; border-radius:12px; background:color-mix(in srgb, var(--teal) 10%, transparent); border:1px solid color-mix(in srgb, var(--teal) 35%, transparent);}
+  .rest-box .rb-title{font-family:'Kanit',sans-serif; font-weight:700; color:var(--teal); font-size:13px; margin-bottom:5px;}
+  .rest-box ul{margin:6px 0 0; padding-left:16px; font-size:12px; color:var(--ink-dim); line-height:1.65;}
+
+  .weekend-hint{margin:0 0 12px; padding:10px 12px; border-radius:10px; background:color-mix(in srgb, var(--teal) 8%, transparent); border:1px solid color-mix(in srgb, var(--teal) 30%, transparent); font-size:11.5px; color:var(--ink-dim); line-height:1.5;}
+
+  /* tips */
+  .tip-grid{padding:0 16px; display:flex; flex-direction:column; gap:9px;}
+  .tip{background:var(--card); border:1px solid var(--card-line); border-radius:12px; padding:12px 14px; font-size:12.5px; color:var(--ink-dim); line-height:1.55;}
+  .tip b{color:var(--ink); font-family:'Kanit',sans-serif; display:block; margin-bottom:3px; font-size:13px;}
+
+  .section-heading{padding:16px 16px 4px; font-family:'Kanit',sans-serif; font-weight:800; font-size:18px; color:var(--ink);}
+  .section-sub{padding:0 16px 4px; font-size:12.5px; color:var(--ink-dim); margin-bottom:6px;}
+
+  footer{text-align:center; color:var(--ink-dim); font-size:10.5px; padding:22px 20px 4px; line-height:1.7;}
+
+  /* bottom nav */
+  .bottom-nav{
+    position:fixed; left:50%; transform:translateX(-50%); bottom:0; width:100%; max-width:520px;
+    display:flex; background:var(--card); border-top:1px solid var(--card-line);
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom)); z-index:40;
+    box-shadow:0 -6px 18px rgba(0,0,0,.18);
+  }
+  .nav-item{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
+    background:none; border:none; padding:8px 4px; border-radius:12px; cursor:pointer;
+    font-family:'Kanit',sans-serif; font-size:10.5px; font-weight:600; color:var(--ink-dim);
+  }
+  .nav-item .ni-icon{font-size:19px; line-height:1;}
+  .nav-item.active{color:var(--gold); background:var(--gold-dim);}
+
+  /* rest timer — single floating play/pause button */
+  .rest-timer-fab{
+    position:fixed; left:50%; transform:translateX(-50%); bottom:calc(78px + env(safe-area-inset-bottom));
+    width:78px; height:78px; z-index:39;
+  }
+  .rest-timer-fab.hidden{display:none;}
+  .rt-ring{position:absolute; inset:0; width:78px; height:78px; transform:rotate(-90deg);}
+  .rt-ring-bg{fill:none; stroke:var(--card-line); stroke-width:5;}
+  .rt-ring-fg{fill:none; stroke:var(--gold); stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset .3s linear;}
+  .rt-fab-btn{
+    position:absolute; inset:7px; border-radius:50%; border:none; cursor:pointer; padding:0;
+    background:var(--gold); color:var(--gold-ink); box-shadow:0 8px 20px rgba(0,0,0,.28);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+    -webkit-tap-highlight-color:transparent; touch-action:none; user-select:none;
+  }
+  .rt-fab-btn i{font-size:17px; line-height:1;}
+  .rt-fab-time{font-family:'Kanit',sans-serif; font-weight:800; font-size:13.5px; line-height:1;}
+  .rt-fab-hint{
+    position:absolute; bottom:100%; left:50%; transform:translateX(-50%); margin-bottom:8px;
+    white-space:nowrap; font-size:10.5px; color:var(--ink-dim); background:var(--card);
+    border:1px solid var(--card-line); padding:4px 9px; border-radius:999px; opacity:0; transition:opacity .2s;
+    pointer-events:none;
+  }
+  .rest-timer-fab.show-hint .rt-fab-hint{opacity:1;}
+
+  /* exercise detail modal */
+  .modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(2px); z-index:60; display:flex; align-items:flex-end; justify-content:center;}
+  .modal-overlay.hidden{display:none;}
+  .modal-sheet{width:100%; max-width:520px; background:var(--card); border-radius:22px 22px 0 0; padding:8px 20px calc(20px + env(safe-area-inset-bottom)); max-height:82vh; overflow-y:auto; animation:sheetUp .2s ease;}
+  @keyframes sheetUp{from{transform:translateY(24px); opacity:.4;} to{transform:translateY(0); opacity:1;}}
+  .modal-handle{width:36px; height:4px; background:var(--card-line); border-radius:2px; margin:8px auto 14px;}
+  .modal-header{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:14px;}
+  .modal-emoji{font-size:26px; margin-bottom:4px;}
+  .modal-header h3{font-family:'Kanit',sans-serif; font-size:18px; margin:0 0 4px; font-weight:700; color:var(--ink);}
+  .modal-muscle{font-size:12px; color:var(--gold); font-weight:600; font-family:'Kanit',sans-serif;}
+  .modal-close{flex:0 0 auto; width:32px; height:32px; border-radius:10px; border:1px solid var(--card-line); background:var(--bg-alt); color:var(--ink-dim); font-size:14px; cursor:pointer;}
+  .modal-meta{display:flex; gap:8px; margin-bottom:16px;}
+  .mm-item{flex:1; background:var(--bg-alt); border:1px solid var(--card-line); border-radius:12px; padding:9px 12px;}
+  .mm-item span{display:block; font-size:10px; color:var(--ink-dim); margin-bottom:2px;}
+  .mm-item b{font-family:'Kanit',sans-serif; font-size:14px; color:var(--ink);}
+  .modal-steps{display:flex; flex-direction:column; gap:10px; margin-bottom:14px;}
+  .step{display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--ink); line-height:1.55;}
+  .step-num{flex:0 0 auto; width:22px; height:22px; border-radius:50%; background:var(--gold-dim); color:var(--gold); font-family:'Kanit',sans-serif; font-weight:700; font-size:11.5px; display:flex; align-items:center; justify-content:center;}
+  .tip-line{background:var(--gold-dim); border-radius:10px; padding:10px 12px; font-size:12.5px; color:var(--ink-dim); line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="app-top">
+  <div>
+    <div class="eyebrow">โปรแกรม 6 วัน/สัปดาห์</div>
+    <h1>สร้างกล้ามเนื้อ ลดไขมัน</h1>
+  </div>
+  <button class="theme-btn" id="themeToggle" onclick="toggleTheme()" aria-label="สลับโหมดสว่าง/มืด"><i class="bi bi-moon-stars"></i></button>
+</div>
+
+<!-- ===== SECTION: HOME (day workouts) ===== -->
+<section id="section-home" class="section active">
+
+  <div class="tabs" id="tabs">
+    <div class="tab active tab-gold" data-day="mon" style="--accent:var(--gold)">จันทร์<span class="d">อก/ไทรเซ็ป</span></div>
+    <div class="tab" data-day="tue" style="--accent:var(--pink)">อังคาร<span class="d">หลัง/ไบเซ็ป</span></div>
+    <div class="tab" data-day="wed" style="--accent:var(--green)">พุธ<span class="d">ขา</span></div>
+    <div class="tab" data-day="thu" style="--accent:var(--orange)">พฤหัส<span class="d">ไหล่/แกนกลาง</span></div>
+    <div class="tab" data-day="fri" style="--accent:var(--blue)">ศุกร์<span class="d">Full Body</span></div>
+    <div class="tab" data-day="sat" style="--accent:var(--violet)">เสาร์<span class="d">ยืดหยุ่น</span></div>
+    <div class="tab" data-day="sun" style="--accent:var(--red)">อาทิตย์<span class="d">ยืดหยุ่น</span></div>
+  </div>
+
+  <!-- MONDAY -->
+  <div class="panel active" id="panel-mon">
+    <div class="day-card" style="--accent:var(--gold)">
+      <div class="day-head">
+        <div><div class="day-name">อก + ไทรเซ็ป</div><div class="day-focus">Push Day A · เน้นแรงดันหน้าอก</div></div>
+        <div class="day-badge"><i class="bi bi-fire"></i> Push</div>
+      </div>
+      <div class="ex-list">
+        <div class="ex-row" data-key="m1" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-activity"></i> เบนช์เพรส (บาร์เบล/ดัมเบล)</div><div class="ex-cue">กดแท่งลงช้าๆ นับ 2 วิให้แตะใกล้หน้าอก แล้วดันขึ้นเต็มแรง</div></div>
+          <div class="ex-meta"><span class="chip">4×8–10</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 90 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="m2" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-triangle"></i> ดัมเบลเพรสท่าเอียง 30°</div><div class="ex-cue">เน้นอกบน ล็อกสะบักแนบม้านั่งตลอดท่า</div></div>
+          <div class="ex-meta"><span class="chip">3×10–12</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 75 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="m3" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrows-angle-expand"></i> เคเบิล/ดัมเบลฟลาย</div><div class="ex-cue">แขนโค้งเล็กน้อยตลอดท่า กาง-หุบเหมือนกอด</div></div>
+          <div class="ex-meta"><span class="chip">3×12–15</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 60 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="m4" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-star-fill"></i> ไทรเซ็ปเอ็กซ์เทนชันเหนือศีรษะ</div><div class="ex-cue">ศอกชิดหู งอ-เหยียดเฉพาะข้อศอก</div></div>
+          <div class="ex-meta"><span class="chip">3×12</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 60 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="m5" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-down-circle"></i> เคเบิลไทรเซ็ปพุชดาวน์</div><div class="ex-cue">ศอกแนบลำตัว ดันลงจนแขนเหยียดสุด</div></div>
+          <div class="ex-meta"><span class="chip">3×12–15</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 45 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="m6" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-square"></i> แพลงก์</div><div class="ex-cue">ลำตัวเป็นเส้นตรง เกร็งหน้าท้อง-สะโพก</div></div>
+          <div class="ex-meta"><span class="chip">3×45–60วิ</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 45 วิ</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TUESDAY -->
+  <div class="panel" id="panel-tue">
+    <div class="day-card" style="--accent:var(--pink)">
+      <div class="day-head">
+        <div><div class="day-name">หลัง + ไบเซ็ป</div><div class="day-focus">Pull Day A · เน้นแรงดึง</div></div>
+        <div class="day-badge"><i class="bi bi-bullseye"></i> Pull</div>
+      </div>
+      <div class="ex-list">
+        <div class="ex-row" data-key="t1" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-down-circle"></i> ดึงบาร์เหนือศีรษะ (Lat Pulldown)</div><div class="ex-cue">ดึงลงมาระดับหน้าอก บีบสะบักช่วงล่างสุด</div></div>
+          <div class="ex-meta"><span class="chip">4×8–10</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 90 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="t2" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-water"></i> บาร์เบล/ดัมเบลโรว์</div><div class="ex-cue">หลังตรงก้มลำตัว 45° ดึงเข้าหาท้องน้อย</div></div>
+          <div class="ex-meta"><span class="chip">3×10–12</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 75 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="t3" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-bar-down"></i> Seated Cable Row</div><div class="ex-cue">ดึงเข้าหาลำตัว ไม่โยกหลังช่วยแรง</div></div>
+          <div class="ex-meta"><span class="chip">3×10–12</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 60 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="t4" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-bullseye"></i> Face Pull</div><div class="ex-cue">ดึงเชือกเข้าหาหน้า ศอกสูงกว่ามือ เน้นบ่าหลัง</div></div>
+          <div class="ex-meta"><span class="chip">3×15</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 45 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="t5" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-star-fill"></i> บาร์เบล/ดัมเบลเคิร์ล</div><div class="ex-cue">ศอกนิ่งแนบลำตัว งอขึ้นไม่แกว่งตัวช่วย</div></div>
+          <div class="ex-meta"><span class="chip">3×10–12</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 60 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="t6" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-tools"></i> แฮมเมอร์เคิร์ล</div><div class="ex-cue">จับดัมเบลแนวตั้ง เน้นแขนท่อนล่าง</div></div>
+          <div class="ex-meta"><span class="chip">3×12</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 45 วิ</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEDNESDAY -->
+  <div class="panel" id="panel-wed">
+    <div class="day-card" style="--accent:var(--green)">
+      <div class="day-head">
+        <div><div class="day-name">ขา (Leg Day)</div><div class="day-focus">ต้นขา สะโพก น่อง</div></div>
+        <div class="day-badge"><i class="bi bi-lightning-charge-fill"></i> Legs</div>
+      </div>
+      <div class="ex-list">
+        <div class="ex-row" data-key="w1" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-activity"></i> สควอท (Barbell/Goblet)</div><div class="ex-cue">ย่อสะโพกจนต้นขาขนานพื้น เข่าตามแนวปลายเท้า</div></div>
+          <div class="ex-meta"><span class="chip">4×8–10</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 2 นาที</span></div>
+        </div>
+        <div class="ex-row" data-key="w2" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-down-up"></i> Romanian Deadlift</div><div class="ex-cue">เข่างอเล็กน้อย ดันสะโพกถอยหลัง ตึงต้นขาหลัง</div></div>
+          <div class="ex-meta"><span class="chip">3×10</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 90 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="w3" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-down-square"></i> เลกเพรส</div><div class="ex-cue">ดันแผ่นจนเข่าเกือบเหยียดสุด ไม่ล็อกเข่าแรง</div></div>
+          <div class="ex-meta"><span class="chip">3×12</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 75 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="w4" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-repeat"></i> เลกเคิร์ล</div><div class="ex-cue">งอเข่าดึงแผ่นเข้าหาก้น เน้นต้นขาหลัง</div></div>
+          <div class="ex-meta"><span class="chip">3×12–15</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 60 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="w5" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-person-walking"></i> วอล์กกิ้งลันจ์</div><div class="ex-cue">ก้าวยาว ย่อเข่าหลังเกือบแตะพื้น สลับข้าง</div></div>
+          <div class="ex-meta"><span class="chip">3×12/ข้าง</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 60 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="w6" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-chevron-double-up"></i> คาล์ฟเรส (ยกส้นเท้า)</div><div class="ex-cue">ยกส้นเท้าสูงสุด ค้าง 1 วิ แล้วลงช้าๆ</div></div>
+          <div class="ex-meta"><span class="chip">4×15–20</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 45 วิ</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THURSDAY -->
+  <div class="panel" id="panel-thu">
+    <div class="day-card" style="--accent:var(--orange)">
+      <div class="day-head">
+        <div><div class="day-name">ไหล่ + แกนกลางลำตัว</div><div class="day-focus">Shoulders & Core</div></div>
+        <div class="day-badge"><i class="bi bi-shield-fill"></i> Shoulders</div>
+      </div>
+      <div class="ex-list">
+        <div class="ex-row" data-key="h1" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-activity"></i> Overhead Press</div><div class="ex-cue">ดันบาร์/ดัมเบลขึ้นเหนือศีรษะตรงๆ ไม่แอ่นหลัง</div></div>
+          <div class="ex-meta"><span class="chip">4×8–10</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 90 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="h2" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-left-right"></i> Lateral Raise</div><div class="ex-cue">ยกดัมเบลออกข้างระดับไหล่ ศอกงอเล็กน้อย</div></div>
+          <div class="ex-meta"><span class="chip">3×12–15</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 60 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="h3" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-counterclockwise"></i> Rear Delt Fly</div><div class="ex-cue">ก้มตัวเล็กน้อย กางแขนออกเน้นไหล่หลัง</div></div>
+          <div class="ex-meta"><span class="chip">3×15</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 45 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="h4" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-up-circle"></i> Shrug (ยกไหล่)</div><div class="ex-cue">ยกไหล่ตรงขึ้น ค้าง 1 วิ ไม่หมุนไหล่</div></div>
+          <div class="ex-meta"><span class="chip">3×12</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 45 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="h5" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-down-up"></i> Hanging Leg Raise</div><div class="ex-cue">ห้อยตัว ยกขาจนตั้งฉาก ควบคุมจังหวะลง</div></div>
+          <div class="ex-meta"><span class="chip">3×12–15</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 60 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="h6" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-repeat"></i> Russian Twist</div><div class="ex-cue">นั่งเอนตัว บิดลำตัวซ้าย-ขวาถือน้ำหนักเบา</div></div>
+          <div class="ex-meta"><span class="chip">3×20</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 45 วิ</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRIDAY -->
+  <div class="panel" id="panel-fri">
+    <div class="day-card" style="--accent:var(--blue)">
+      <div class="day-head">
+        <div><div class="day-name">Full Body Circuit + คาร์ดิโอ</div><div class="day-focus">เผาผลาญไขมัน กระตุ้นทั้งตัว</div></div>
+        <div class="day-badge"><i class="bi bi-lightning-fill"></i> Burn</div>
+      </div>
+      <div class="ex-list">
+        <div class="ex-row" data-key="f1" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-activity"></i> Kettlebell/Dumbbell Swing</div><div class="ex-cue">แกว่งน้ำหนักด้วยแรงสะโพก ไม่ใช่แขน</div></div>
+          <div class="ex-meta"><span class="chip">40 วิ</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 20 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="f2" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-arrow-down-up"></i> วิดพื้น (Push-up)</div><div class="ex-cue">ลำตัวตรง กดอกลงใกล้พื้นแล้วดันขึ้น</div></div>
+          <div class="ex-meta"><span class="chip">40 วิ</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 20 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="f3" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-cup-fill"></i> Goblet Squat</div><div class="ex-cue">ถือดัมเบลแนบอก ย่อสควอทลงลึก</div></div>
+          <div class="ex-meta"><span class="chip">40 วิ</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 20 วิ</span></div>
+        </div>
+        <div class="ex-row" data-key="f4" onclick="openExModal(this)">
+          <div><div class="ex-name"><i class="bi bi-speedometer2"></i> Mountain Climber</div><div class="ex-cue">ท่าแพลงก์ สลับดึงเข่าเข้าหาอกเร็วๆ</div></div>
+          <div class="ex-meta"><span class="chip">40 วิ</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 20 วิ</span></div>
+        </div>
+      </div>
+      <div class="day-note"><i class="bi bi-speedometer2"></i> วนเซอร์กิตนี้ 3 รอบ แล้วปิดท้ายด้วยคาร์ดิโอ HIIT 15–20 นาที เช่น วิ่ง/ปั่นจักรยาน สลับหนัก 30 วิ กับเบา 90 วิ</div>
+    </div>
+  </div>
+
+  <!-- SATURDAY -->
+  <div class="panel" id="panel-sat">
+    <div class="weekend-hint"><i class="bi bi-lightbulb-fill"></i> ถ้าสัปดาห์นี้ได้เข้าฟิตเนส กด "เข้าฟิตเนส" ถ้าไม่ได้ไป สลับเป็น "พัก/คาร์ดิโอ" แทนได้เลย</div>
+    <div class="day-card" style="--accent:var(--violet)">
+      <div class="day-head">
+        <div><div class="day-name">เสาร์</div><div class="day-focus">เลือกโหมดของสัปดาห์นี้</div></div>
+        <div class="day-badge"><i class="bi bi-shuffle"></i> ยืดหยุ่น</div>
+      </div>
+      <div class="toggle-bar">
+        <button class="toggle-btn active" onclick="setMode('sat','gym',this)"><i class="bi bi-activity"></i> เข้าฟิตเนส</button>
+        <button class="toggle-btn" onclick="setMode('sat','rest',this)"><i class="bi bi-flower1"></i> พัก/คาร์ดิโอ</button>
+      </div>
+      <div id="sat-gym" class="toggle-pane active">
+        <div class="ex-list">
+          <div class="ex-row" data-key="s1" onclick="openExModal(this)">
+            <div><div class="ex-name"><i class="bi bi-star-fill"></i> ซูเปอร์เซ็ต ไบเซ็ป + ไทรเซ็ป</div><div class="ex-cue">ทำ 2 ท่าต่อกันไม่พัก เน้นปั๊มแขนรอบวง</div></div>
+            <div class="ex-meta"><span class="chip">3×12</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 60 วิ</span></div>
+          </div>
+          <div class="ex-row" data-key="s2" onclick="openExModal(this)">
+            <div><div class="ex-name"><i class="bi bi-arrows-angle-contract"></i> Cable Crossover</div><div class="ex-cue">ดึงสายไขว้หน้าอก บีบกล้ามอกกลาง</div></div>
+            <div class="ex-meta"><span class="chip">3×12–15</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 60 วิ</span></div>
+          </div>
+          <div class="ex-row" data-key="s3" onclick="openExModal(this)">
+            <div><div class="ex-name"><i class="bi bi-square"></i> Ab Wheel / Sit-up</div><div class="ex-cue">คุมจังหวะช้าๆ เกร็งหน้าท้องตลอดท่า</div></div>
+            <div class="ex-meta"><span class="chip">3×15</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 45 วิ</span></div>
+          </div>
+        </div>
+      </div>
+      <div id="sat-rest" class="toggle-pane">
+        <div class="rest-box">
+          <div class="rb-title"><i class="bi bi-flower1"></i> วันพักฟื้น / คาร์ดิโอเบา</div>
+          <ul>
+            <li>เดินเร็ว หรือปั่นจักรยานเบาๆ 30–40 นาที</li>
+            <li>ยืดเหยียดกล้ามเนื้อทั่วตัว 15–20 นาที</li>
+            <li>โฟมโรลเลอร์คลายกล้ามเนื้อจุดที่ตึง</li>
+            <li>หรือพักเต็มวัน นอนหลับให้เพียงพอ</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUNDAY -->
+  <div class="panel" id="panel-sun">
+    <div class="weekend-hint"><i class="bi bi-lightbulb-fill"></i> กติกาเดียวกับวันเสาร์ — เลือกโหมดตามที่ไปฟิตเนสจริงในสัปดาห์นั้น</div>
+    <div class="day-card" style="--accent:var(--red)">
+      <div class="day-head">
+        <div><div class="day-name">อาทิตย์</div><div class="day-focus">เลือกโหมดของสัปดาห์นี้</div></div>
+        <div class="day-badge"><i class="bi bi-shuffle"></i> ยืดหยุ่น</div>
+      </div>
+      <div class="toggle-bar">
+        <button class="toggle-btn active" onclick="setMode('sun','gym',this)"><i class="bi bi-activity"></i> เข้าฟิตเนส</button>
+        <button class="toggle-btn" onclick="setMode('sun','rest',this)"><i class="bi bi-flower1"></i> พัก/คาร์ดิโอ</button>
+      </div>
+      <div id="sun-gym" class="toggle-pane active">
+        <div class="ex-list">
+          <div class="ex-row" data-key="u1" onclick="openExModal(this)">
+            <div><div class="ex-name"><i class="bi bi-lightning-charge-fill"></i> Leg Extension เบาๆ</div><div class="ex-cue">น้ำหนักเบา เน้นรู้สึกกล้ามหน้าขาทำงาน</div></div>
+            <div class="ex-meta"><span class="chip">3×15</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 45 วิ</span></div>
+          </div>
+          <div class="ex-row" data-key="u2" onclick="openExModal(this)">
+            <div><div class="ex-name"><i class="bi bi-arrow-bar-down"></i> Glute Bridge</div><div class="ex-cue">นอนหงาย ดันสะโพกขึ้นบีบก้นค้าง 1 วิ</div></div>
+            <div class="ex-meta"><span class="chip">3×15</span><span class="chip-rest tappable" onclick="event.stopPropagation(); startRestTimer(this)"><i class="bi bi-stopwatch"></i> พัก 45 วิ</span></div>
+          </div>
+          <div class="ex-row" data-key="u3" onclick="openExModal(this)">
+            <div><div class="ex-name"><i class="bi bi-person-walking"></i> คาร์ดิโอเบา (เดิน/จักรยาน)</div><div class="ex-cue">ความหนักปานกลาง พูดคุยได้ระหว่างทำ</div></div>
+            <div class="ex-meta"><span class="chip">20 นาที</span><span class="chip-rest">—</span></div>
+          </div>
+        </div>
+      </div>
+      <div id="sun-rest" class="toggle-pane">
+        <div class="rest-box">
+          <div class="rb-title"><i class="bi bi-flower1"></i> วันพักเต็มวัน</div>
+          <ul>
+            <li>นอนหลับให้ครบ 7–8 ชั่วโมง</li>
+            <li>ยืดเหยียดเบาๆ หรือเดินเล่นสบายๆ</li>
+            <li>เตรียมมื้ออาหาร/วางแผนโปรตีนสัปดาห์ถัดไป</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ===== SECTION: CALC (profile + results) ===== -->
+<section id="section-calc" class="section">
+  <div class="section-heading">คำนวณของคุณ</div>
+  <div class="section-sub">กรอกข้อมูลเพื่อคำนวณโปรตีน แคลอรี่ และโซนหัวใจให้เหมาะกับคุณ</div>
+
+  <div class="profile">
+    <div class="gender-toggle">
+      <button class="gtab active" data-gender="male" onclick="setGender('male',this)"><i class="bi bi-gender-male"></i> ชาย</button>
+      <button class="gtab" data-gender="female" onclick="setGender('female',this)"><i class="bi bi-gender-female"></i> หญิง</button>
+    </div>
+    <div class="profile-inputs">
+      <label class="pfield"><span>อายุ</span><div class="iwrap"><input type="number" id="ageInput" value="28" min="10" max="100" oninput="updateProfile()"><span class="unit">ปี</span></div></label>
+      <label class="pfield"><span>น้ำหนัก</span><div class="iwrap"><input type="number" id="weightInput" value="76" min="30" max="200" oninput="updateProfile()"><span class="unit">กก.</span></div></label>
+      <label class="pfield"><span>ส่วนสูง</span><div class="iwrap"><input type="number" id="heightInput" value="179" min="100" max="250" oninput="updateProfile()"><span class="unit">ซม.</span></div></label>
+    </div>
+  </div>
+
+  <div class="calc-card">
+    <div class="calc-title"><i class="bi bi-bar-chart-line-fill"></i> ผลการคำนวณ</div>
+    <div class="calc-sub">เลือกระดับกิจกรรมให้ตรงกับที่ฝึกจริง เพื่อคำนวณแคลอรี่ให้แม่นขึ้น</div>
+    <div class="activity-pills">
+      <div class="apill" data-act="1.375" onclick="setActivity('1.375',this)">นั่งทำงาน+ฝึกเบา</div>
+      <div class="apill active" data-act="1.55" onclick="setActivity('1.55',this)">ฝึก 4–6 วัน/สัปดาห์</div>
+      <div class="apill" data-act="1.725" onclick="setActivity('1.725',this)">ฝึกหนักเกือบทุกวัน</div>
+    </div>
+    <div class="calc-grid">
+      <div class="calc-tile">
+        <div class="ct-label">BMI</div>
+        <div class="ct-value" id="bmiValue">23.7</div>
+        <span class="bmi-tag" id="bmiTag">ปกติ</span>
+      </div>
+      <div class="calc-tile">
+        <div class="ct-label">โปรตีน/วัน</div>
+        <div class="ct-value" id="proteinValue">120–165 <small>ก.</small></div>
+      </div>
+      <div class="calc-tile">
+        <div class="ct-label">BMR (เผาผลาญพื้นฐาน)</div>
+        <div class="ct-value" id="bmrValue">1,745 <small>กแคล</small></div>
+      </div>
+      <div class="calc-tile">
+        <div class="ct-label">TDEE (ใช้จริงต่อวัน)</div>
+        <div class="ct-value" id="tdeeValue">2,705 <small>กแคล</small></div>
+      </div>
+      <div class="calc-tile">
+        <div class="ct-label">น้ำที่ควรดื่ม/วัน</div>
+        <div class="ct-value" id="waterValue">2.5 <small>ลิตร</small></div>
+      </div>
+      <div class="calc-tile wide">
+        <div class="ct-label">เป้าหมายแคลอรี่/วัน (เพื่อลดไขมัน คุมมวลกล้าม)</div>
+        <div class="ct-value" id="targetCalValue">2,305 <small>กแคล/วัน (พร่อง ~400)</small></div>
+      </div>
+    </div>
+    <div class="hr-title">โซนอัตราการเต้นหัวใจ (สำหรับวันคาร์ดิโอ)</div>
+    <div class="hr-zones" id="hrZones">
+      <div class="hz-row"><div><div class="hz-name"><i class="bi bi-circle-fill hz-dot" style="color:var(--blue)"></i> โซนอบอุ่นร่างกาย</div><span class="hz-desc">50–60% ของ Max HR</span></div><div class="hz-range" id="hzWarm">96–115</div></div>
+      <div class="hz-row"><div><div class="hz-name"><i class="bi bi-circle-fill hz-dot" style="color:var(--green)"></i> โซนเผาผลาญไขมัน</div><span class="hz-desc">60–70% ของ Max HR</span></div><div class="hz-range" id="hzFat">115–134</div></div>
+      <div class="hz-row"><div><div class="hz-name"><i class="bi bi-circle-fill hz-dot" style="color:var(--orange)"></i> โซนคาร์ดิโอ</div><span class="hz-desc">70–80% ของ Max HR — เหมาะกับวันศุกร์</span></div><div class="hz-range" id="hzCardio">134–154</div></div>
+      <div class="hz-row"><div><div class="hz-name"><i class="bi bi-circle-fill hz-dot" style="color:var(--red)"></i> โซนหนัก (HIIT)</div><span class="hz-desc">80–90% ของ Max HR</span></div><div class="hz-range" id="hzPeak">154–173</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: TIPS ===== -->
+<section id="section-tips" class="section">
+  <div class="section-heading">เคล็ดลับให้โปรแกรมได้ผล</div>
+  <div class="section-sub">อ่านคร่าวๆ ก่อนเริ่ม จะช่วยให้เห็นผลไวขึ้น</div>
+  <div class="tip-grid">
+    <div class="tip"><b><i class="bi bi-egg-fried"></i> โปรตีนต้องพอ</b>1.6–2.2 กรัม/น้ำหนักตัว 1 กก. (<span id="tipWeight">76</span> กก. ≈ <span id="tipProteinRange">120–165</span> กรัม/วัน) กระจายทุกมื้อ</div>
+    <div class="tip"><b><i class="bi bi-fire"></i> พร่องแคลอรี่แบบพอดี</b>ลดพลังงาน 300–500 กิโลแคลอรี่/วัน พร้อมยกเวทหนักพอควรเพื่อรักษามวลกล้ามเนื้อ</div>
+    <div class="tip"><b><i class="bi bi-graph-up-arrow"></i> เพิ่มน้ำหนัก/ครั้งทีละน้อย</b>ทุก 1–2 สัปดาห์ เพิ่มน้ำหนักหรือจำนวนครั้งเล็กน้อยในแต่ละท่า</div>
+    <div class="tip"><b><i class="bi bi-arrow-repeat"></i> วอร์มอัพก่อนทุกครั้ง</b>ยืดเหยียดแบบเคลื่อนไหว 5–10 นาที และเซ็ตเบาก่อนเข้าเซ็ตหลัก</div>
+    <div class="tip"><b><i class="bi bi-moon"></i> นอนให้พอ</b>7–8 ชั่วโมง/คืน กล้ามเนื้อฟื้นฟูและเติบโตช่วงพักผ่อน</div>
+    <div class="tip"><b><i class="bi bi-stopwatch"></i> ใช้ตัวจับเวลาพัก</b>แตะที่ชิป "พัก" ข้างแต่ละท่าในหน้าตารางฝึก เพื่อนับถอยหลังให้อัตโนมัติ ไม่ต้องเดาเอง</div>
+  </div>
+  <footer>
+    ตารางนี้เป็นแนวทางทั่วไป หากมีโรคประจำตัวควรปรึกษาแพทย์/เทรนเนอร์ก่อนเริ่ม<br>
+    บันทึกหน้านี้ไว้ในมือถือเพื่อเปิดดูได้ทุกครั้งที่เข้าฟิตเนส <i class="bi bi-phone"></i>
+  </footer>
+</section>
+
+<!-- rest timer: single floating play/pause button -->
+<div class="rest-timer-fab hidden" id="restTimerBar">
+  <span class="rt-fab-hint" id="rtFabHint">ค้างไว้เพื่อยกเลิก</span>
+  <svg class="rt-ring" viewBox="0 0 78 78">
+    <circle class="rt-ring-bg" cx="39" cy="39" r="34"></circle>
+    <circle class="rt-ring-fg" id="rtRingFg" cx="39" cy="39" r="34"></circle>
+  </svg>
+  <button class="rt-fab-btn" id="rtFabBtn"
+    onpointerdown="fabPressStart(event)" onpointerup="fabPressEnd(event)"
+    onpointerleave="fabPressCancel()" onpointercancel="fabPressCancel()"
+    aria-label="แตะเพื่อพัก หรือเล่นต่อ ค้างไว้เพื่อยกเลิก">
+    <i class="bi bi-pause-fill" id="rtFabIcon"></i>
+    <span class="rt-fab-time" id="rtTime">01:30</span>
+  </button>
+</div>
+
+<!-- bottom nav -->
+<nav class="bottom-nav">
+  <button class="nav-item active" data-section="home" onclick="switchSection('home',this)"><span class="ni-icon"><i class="bi bi-house-door-fill"></i></span><span>วันนี้</span></button>
+  <button class="nav-item" data-section="calc" onclick="switchSection('calc',this)"><span class="ni-icon"><i class="bi bi-bar-chart-line-fill"></i></span><span>คำนวณ</span></button>
+  <button class="nav-item" data-section="tips" onclick="switchSection('tips',this)"><span class="ni-icon"><i class="bi bi-lightbulb-fill"></i></span><span>เคล็ดลับ</span></button>
+</nav>
+
+<!-- exercise detail modal -->
+<div class="modal-overlay hidden" id="exModalOverlay" onclick="if(event.target===this) hideExModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div>
+        <div class="modal-emoji" id="modalEmoji"><i class="bi bi-activity"></i></div>
+        <h3 id="modalName">ชื่อท่า</h3>
+        <span class="modal-muscle" id="modalMuscle">กล้ามเนื้อเป้าหมาย</span>
+      </div>
+      <button class="modal-close" onclick="hideExModal()" aria-label="ปิด"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-meta">
+      <div class="mm-item"><span>ปริมาณ</span><b id="modalSets">4×8–10</b></div>
+      <div class="mm-item"><span>พัก</span><b id="modalRest">90 วิ</b></div>
+    </div>
+    <div class="modal-steps" id="modalSteps"></div>
+    <div id="modalTip"></div>
+  </div>
+</div>
+
+<script>
+  // ===== theme =====
+  const root = document.documentElement;
+  const themeBtn = document.getElementById('themeToggle');
+  function applyTheme(t){
+    root.setAttribute('data-theme', t);
+    themeBtn.innerHTML = t === 'light' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
+  }
+  const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  applyTheme(prefersLight ? 'light' : 'dark');
+  function toggleTheme(){
+    const current = root.getAttribute('data-theme');
+    applyTheme(current === 'light' ? 'dark' : 'light');
+  }
+
+  // ===== bottom nav / sections =====
+  function switchSection(name, btn){
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('active');
+    window.scrollTo({top:0, behavior:'auto'});
+  }
+
+  // ===== day tabs =====
+  document.getElementById('tabs').addEventListener('click', function(e){
+    const tab = e.target.closest('.tab');
+    if(!tab) return;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.day).classList.add('active');
+  });
+
+  // ===== profile + calculations =====
+  let currentGender = 'male';
+  let currentActivity = 1.55;
+
+  function setGender(gender, el){
+    el.parentElement.querySelectorAll('.gtab').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    currentGender = gender;
+    updateProfile();
+  }
+  function setActivity(act, el){
+    el.parentElement.querySelectorAll('.apill').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    currentActivity = parseFloat(act);
+    updateProfile();
+  }
+  function updateProfile(){
+    const age = parseFloat(document.getElementById('ageInput').value) || 0;
+    const w = parseFloat(document.getElementById('weightInput').value) || 0;
+    const h = parseFloat(document.getElementById('heightInput').value) || 0;
+    if(w <= 0 || h <= 0 || age <= 0) return;
+
+    const lo = Math.round(w * 1.6);
+    const hi = Math.round(w * 2.2);
+    document.getElementById('proteinValue').innerHTML = lo + '–' + hi + ' <small>ก.</small>';
+    document.getElementById('tipWeight').textContent = w;
+    document.getElementById('tipProteinRange').textContent = lo + '–' + hi;
+
+    const hM = h / 100;
+    const bmi = w / (hM * hM);
+    document.getElementById('bmiValue').textContent = bmi.toFixed(1);
+    let bmiCat = 'ปกติ';
+    if(bmi < 18.5) bmiCat = 'น้ำหนักน้อย';
+    else if(bmi < 23) bmiCat = 'ปกติ';
+    else if(bmi < 25) bmiCat = 'น้ำหนักเกิน';
+    else if(bmi < 30) bmiCat = 'อ้วนระดับ 1';
+    else bmiCat = 'อ้วนระดับ 2';
+    document.getElementById('bmiTag').textContent = bmiCat;
+
+    let bmr;
+    if(currentGender === 'male'){
+      bmr = 10*w + 6.25*h - 5*age + 5;
+    } else {
+      bmr = 10*w + 6.25*h - 5*age - 161;
+    }
+    document.getElementById('bmrValue').innerHTML = Math.round(bmr).toLocaleString() + ' <small>กแคล</small>';
+
+    const tdee = bmr * currentActivity;
+    document.getElementById('tdeeValue').innerHTML = Math.round(tdee).toLocaleString() + ' <small>กแคล</small>';
+
+    const target = tdee - 400;
+    document.getElementById('targetCalValue').innerHTML = Math.round(target).toLocaleString() + ' <small>กแคล/วัน (พร่อง ~400)</small>';
+
+    const waterL = (w * 33) / 1000;
+    document.getElementById('waterValue').innerHTML = waterL.toFixed(1) + ' <small>ลิตร</small>';
+
+    const maxHR = 220 - age;
+    document.getElementById('hzWarm').textContent = Math.round(maxHR*0.5) + '–' + Math.round(maxHR*0.6);
+    document.getElementById('hzFat').textContent = Math.round(maxHR*0.6) + '–' + Math.round(maxHR*0.7);
+    document.getElementById('hzCardio').textContent = Math.round(maxHR*0.7) + '–' + Math.round(maxHR*0.8);
+    document.getElementById('hzPeak').textContent = Math.round(maxHR*0.8) + '–' + Math.round(maxHR*0.9);
+  }
+  updateProfile();
+
+  // ===== weekend gym/rest toggle =====
+  function setMode(day, mode, el){
+    const bar = el.parentElement;
+    bar.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById(day + '-gym').classList.toggle('active', mode === 'gym');
+    document.getElementById(day + '-rest').classList.toggle('active', mode === 'rest');
+  }
+
+  // ===== rest timer (single floating play/pause button) =====
+  let timerInterval = null;
+  let timerSeconds = 0;
+  let totalTimerSeconds = 0;
+  let timerPaused = false;
+  let autoHideTimeout = null;
+
+  const RING_CIRCUMFERENCE = 2 * Math.PI * 34;
+  const ringFg = document.getElementById('rtRingFg');
+  ringFg.style.strokeDasharray = RING_CIRCUMFERENCE;
+  ringFg.style.strokeDashoffset = 0;
+
+  function parseRestSeconds(text){
+    text = text.trim();
+    const minMatch = text.match(/(\d+)\s*นาที/);
+    if(minMatch) return parseInt(minMatch[1], 10) * 60;
+    const secMatch = text.match(/(\d+)\s*วิ/);
+    if(secMatch) return parseInt(secMatch[1], 10);
+    return null;
+  }
+  function startRestTimer(el){
+    const seconds = parseRestSeconds(el.textContent);
+    if(!seconds) return;
+    clearInterval(timerInterval);
+    clearTimeout(autoHideTimeout);
+    timerSeconds = seconds;
+    totalTimerSeconds = seconds;
+    timerPaused = false;
+    document.getElementById('rtFabIcon').className = 'bi bi-pause-fill';
+    updateTimerDisplay();
+    document.getElementById('restTimerBar').classList.remove('hidden');
+    timerInterval = setInterval(tick, 1000);
+  }
+  function tick(){
+    if(timerPaused) return;
+    timerSeconds--;
+    if(timerSeconds <= 0){
+      clearInterval(timerInterval);
+      timerSeconds = 0;
+      updateTimerDisplay();
+      document.getElementById('rtFabIcon').className = 'bi bi-check-lg';
+      playBeep();
+      if(navigator.vibrate) navigator.vibrate([200,100,200]);
+      autoHideTimeout = setTimeout(stopTimer, 3000);
+      return;
+    }
+    updateTimerDisplay();
+  }
+  function updateTimerDisplay(){
+    const m = Math.floor(timerSeconds/60).toString().padStart(2,'0');
+    const s = (timerSeconds%60).toString().padStart(2,'0');
+    document.getElementById('rtTime').textContent = m + ':' + s;
+    const progress = totalTimerSeconds > 0 ? timerSeconds / totalTimerSeconds : 0;
+    ringFg.style.strokeDashoffset = RING_CIRCUMFERENCE * (1 - progress);
+  }
+  function toggleTimerPause(){
+    timerPaused = !timerPaused;
+    document.getElementById('rtFabIcon').className = timerPaused ? 'bi bi-play-fill' : 'bi bi-pause-fill';
+  }
+  function stopTimer(){
+    clearInterval(timerInterval);
+    clearTimeout(autoHideTimeout);
+    document.getElementById('restTimerBar').classList.add('hidden');
+  }
+  function playBeep(){
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = 880;
+      o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.15, ctx.currentTime);
+      o.start();
+      o.stop(ctx.currentTime + 0.35);
+    }catch(e){}
+  }
+
+  // tap = pause/resume immediately, long-press (550ms) = cancel
+  let fabPressTimer = null;
+  let fabLongPressed = false;
+  function fabPressStart(e){
+    if(e && e.preventDefault) e.preventDefault();
+    fabLongPressed = false;
+    document.getElementById('restTimerBar').classList.add('show-hint');
+    fabPressTimer = setTimeout(() => {
+      fabLongPressed = true;
+      if(navigator.vibrate) navigator.vibrate(40);
+      stopTimer();
+    }, 550);
+  }
+  function fabPressEnd(e){
+    if(e && e.preventDefault) e.preventDefault();
+    clearTimeout(fabPressTimer);
+    document.getElementById('restTimerBar').classList.remove('show-hint');
+    if(!fabLongPressed) toggleTimerPause();
+  }
+  function fabPressCancel(){
+    clearTimeout(fabPressTimer);
+    document.getElementById('restTimerBar').classList.remove('show-hint');
+  }
+
+  // ===== exercise detail modal =====
+  const exerciseDetails = {
+    m1:{muscle:'อก, ไหล่หน้า, ไทรเซ็ป', steps:['นอนราบบนม้านั่ง วางเท้าให้มั่นคง จับบาร์กว้างกว่าหัวไหล่เล็กน้อย','ปลดบาร์ออกจากแร็ค ควบคุมให้ลงมาแตะหน้าอกช้าๆ ศอกทำมุมประมาณ 45° กับลำตัว','ดันบาร์ขึ้นจนแขนเกือบเหยียดสุด หายใจออกตอนดัน'], tip:'อย่าเด้งบาร์ที่หน้าอก และอย่าให้สะบักลอยจากม้านั่งตลอดท่า'},
+    m2:{muscle:'อกบน, ไหล่หน้า', steps:['ปรับม้านั่งเอียง 30° ไม่ชันเกินไปเพื่อไม่ให้ไหล่ทำงานแทนอก','กดดัมเบลลงช้าๆ จนศอกอยู่ระดับหน้าอกบน','ดันขึ้นบีบอกที่จุดสูงสุด'], tip:'ถ้าเอียงม้านั่งเกิน 45° จะกลายเป็นเน้นไหล่แทนอกบน'},
+    m3:{muscle:'อก (ตรงกลาง-นอก)', steps:['ยืน/นั่งจับสายเคเบิลหรือดัมเบลสองข้าง แขนโค้งเล็กน้อยคงที่ตลอดท่า','กางแขนออกช้าๆ จนรู้สึกยืดที่หน้าอก','หุบแขนเข้าหากันเหมือนกอด บีบอกที่จุดกึ่งกลาง'], tip:'อย่าล็อกศอกตรง และอย่าใช้แรงเหวี่ยงช่วย'},
+    m4:{muscle:'ไทรเซ็ปหัวยาว', steps:['ยืนหรือนั่ง ถือดัมเบล/EZ บาร์เหนือศีรษะสองมือ','งอศอกลดน้ำหนักลงด้านหลังศีรษะช้าๆ ศอกชี้ตรงไม่กาง','เหยียดแขนกลับขึ้นจนสุดโดยไม่ล็อกศอกแรง'], tip:'เก็บศอกให้นิ่งชิดหูตลอดการเคลื่อนไหว อย่าให้ศอกกางออก'},
+    m5:{muscle:'ไทรเซ็ปทั้งหมด', steps:['ยืนหน้าเครื่องเคเบิล จับบาร์/เชือก ศอกแนบลำตัว','ดันบาร์ลงจนแขนเหยียดสุด บีบไทรเซ็ปค้าง 1 วิ','ปล่อยขึ้นช้าๆ ควบคุมน้ำหนักตลอดทาง'], tip:'อย่าก้มตัวช่วยแรง ให้ศอกอยู่กับที่ตลอดท่า'},
+    m6:{muscle:'แกนกลางลำตัวทั้งหมด', steps:['วางศอกและปลายเท้ายันพื้น ลำตัวเป็นเส้นตรงจากหัวถึงส้นเท้า','เกร็งหน้าท้องและสะโพก ไม่ให้ก้นยกหรือยุบ','หายใจปกติ ค้างท่าตามเวลาที่กำหนด'], tip:'ถ้าเอวแอ่นหรือก้นยกสูง ให้ลดเวลาลงและปรับฟอร์มก่อน'},
+
+    t1:{muscle:'หลังกว้าง (Lats)', steps:['นั่งจับบาร์กว้างกว่าหัวไหล่ ล็อกเข่าใต้เบาะรอง','ดึงบาร์ลงมาระดับหน้าอกบน อกยื่นเล็กน้อย','บีบสะบักเข้าหากันที่จุดล่างสุด แล้วปล่อยขึ้นช้าๆ'], tip:'อย่าโยกตัวช่วยแรงหรือดึงบาร์ไปด้านหลังคอ'},
+    t2:{muscle:'กลางหลัง, ปีก', steps:['ก้มลำตัวทำมุมประมาณ 45° หลังตรง เข่างอเล็กน้อย','ดึงบาร์/ดัมเบลเข้าหาท้องน้อย ศอกชิดลำตัว','บีบสะบักที่จุดสูงสุดแล้วปล่อยลงช้าๆ'], tip:'อย่าก้มหลังงอ รักษาแนวกระดูกสันหลังให้ตรงตลอดท่า'},
+    t3:{muscle:'กลางหลัง', steps:['นั่งจับที่จับ เท้าดันแท่นวางให้มั่นคง หลังตรง','ดึงที่จับเข้าหาลำตัวช่วงท้อง ศอกแนบข้างลำตัว','บีบสะบักค้าง 1 วิ แล้วปล่อยแขนกลับช้าๆ'], tip:'อย่าโยกลำตัวไปมาเพื่อช่วยแรงดึง ให้หลังนิ่งตลอดท่า'},
+    t4:{muscle:'ไหล่หลัง, บ่าบน', steps:['จับเชือกที่ระดับหน้า ยืนหรือคุกเข่ามั่นคง','ดึงเชือกเข้าหาหน้า แยกปลายเชือกออกสองข้าง ศอกสูงกว่ามือ','บีบไหล่หลังค้าง 1 วิ แล้วปล่อยกลับช้าๆ'], tip:'ใช้น้ำหนักเบา เน้นความรู้สึกที่ไหล่หลังมากกว่าน้ำหนักที่ยก'},
+    t5:{muscle:'ไบเซ็ป', steps:['ยืนตรง ถือบาร์/ดัมเบล ศอกแนบลำตัวนิ่ง','งอศอกยกน้ำหนักขึ้นจนสุดโดยไม่แกว่งตัวช่วย','ปล่อยลงช้าๆ ควบคุมจนแขนเหยียดเกือบสุด'], tip:'ถ้าต้องแกว่งตัวเพื่อยกขึ้น แปลว่าน้ำหนักหนักเกินไป'},
+    t6:{muscle:'ไบเซ็ป, ปลายแขน', steps:['ถือดัมเบลแนวตั้งแบบจับค้อน (ฝ่ามือหันเข้าหาลำตัว)','งอศอกยกขึ้นโดยรักษามุมข้อมือให้เป็นกลางตลอดท่า','ปล่อยลงช้าๆ สลับข้างหรือยกพร้อมกันตามถนัด'], tip:'ท่านี้ช่วยเสริมความหนาของแขนและความแข็งแรงของปลายแขนด้วย'},
+
+    w1:{muscle:'ต้นขาหน้า, สะโพก, ก้น', steps:['ยืนแยกเท้ากว้างระดับไหล่ วางบาร์บนบ่าหรือถือดัมเบลแนบอก','ย่อสะโพกลงและถอยก้นไปด้านหลัง จนต้นขาขนานพื้น เข่าตามแนวปลายเท้า','ดันพื้นด้วยส้นเท้ากลับขึ้นสู่ท่ายืน'], tip:'อย่าให้เข่าโถมเข้าด้านในขณะย่อลง และให้อกตั้งตรงตลอดท่า'},
+    w2:{muscle:'ต้นขาหลัง, ก้น', steps:['ยืนถือบาร์/ดัมเบลหน้าขา เข่างอเล็กน้อยคงที่','ดันสะโพกถอยหลัง ก้มลำตัวลง น้ำหนักอยู่ใกล้ขาตลอดทาง','รู้สึกตึงที่ต้นขาหลังแล้วดันสะโพกกลับขึ้นสู่ท่ายืน'], tip:'หลังต้องตรงตลอดท่า ห้ามก้มหลังงอเพื่อไม่ให้บาดเจ็บหลังส่วนล่าง'},
+    w3:{muscle:'ต้นขาหน้า', steps:['นั่งบนเครื่อง วางเท้าบนแท่นกว้างระดับไหล่','ดันแผ่นน้ำหนักออกจนขาเกือบเหยียดสุด ไม่ล็อกเข่าแรง','งอเข่ากลับช้าๆ จนต้นขาใกล้ชิดลำตัว'], tip:'อย่าล็อกเข่าสุดแรงตอนดันออก เพื่อลดแรงกระแทกที่ข้อเข่า'},
+    w4:{muscle:'ต้นขาหลัง', steps:['นอนคว่ำหรือนั่งบนเครื่อง วางขาใต้แท่นรอง','งอเข่าดึงแผ่นน้ำหนักเข้าหาก้นให้สุด','ปล่อยขาลงช้าๆ ควบคุมจนเหยียดเกือบสุด'], tip:'อย่าใช้แรงเหวี่ยงสะโพกช่วย ให้เคลื่อนไหวเฉพาะข้อเข่า'},
+    w5:{muscle:'ต้นขาหน้า, ก้น (ข้างเดียว)', steps:['ยืนตรง ก้าวขาข้างหนึ่งไปข้างหน้ายาวพอสมควร','ย่อเข่าทั้งสองข้างลงจนเข่าหลังเกือบแตะพื้น เข่าหน้าไม่เลยปลายเท้า','ดันพื้นกลับขึ้นแล้วก้าวขาอีกข้างสลับไปเรื่อยๆ'], tip:'รักษาลำตัวให้ตั้งตรง อย่าโน้มตัวไปข้างหน้ามากเกินไป'},
+    w6:{muscle:'น่อง', steps:['ยืนบนขอบแท่นหรือพื้นราบ ปลายเท้าวางมั่นคง','ยกส้นเท้าขึ้นสูงสุดเท่าที่ทำได้ ค้าง 1 วิที่จุดสูงสุด','ลดส้นเท้าลงช้าๆ จนรู้สึกยืดที่น่อง'], tip:'ทำช้าๆ ควบคุมทั้งขาขึ้นและลง จะได้ผลดีกว่าทำเร็วๆ หลายครั้ง'},
+
+    h1:{muscle:'ไหล่ทั้งหมด, ไทรเซ็ป', steps:['ยืนหรือนั่ง ถือบาร์/ดัมเบลระดับไหล่ แกนกลางลำตัวเกร็ง','ดันน้ำหนักขึ้นเหนือศีรษะตรงๆ จนแขนเกือบเหยียดสุด','ลดลงช้าๆ กลับสู่ระดับไหล่โดยไม่แอ่นหลัง'], tip:'ถ้าต้องแอ่นหลังมากเพื่อดันขึ้น ให้ลดน้ำหนักลง'},
+    h2:{muscle:'ไหล่ข้าง (Side Delts)', steps:['ยืนถือดัมเบลข้างลำตัว ศอกงอเล็กน้อยคงที่','ยกแขนออกด้านข้างจนระดับไหล่ ไม่สูงเกินไหล่มากนัก','ลดลงช้าๆ ควบคุมน้ำหนักตลอดทาง'], tip:'ใช้น้ำหนักเบาแต่ควบคุมฟอร์มดี ดีกว่าน้ำหนักหนักแล้วแกว่งตัว'},
+    h3:{muscle:'ไหล่หลัง (Rear Delts)', steps:['ก้มตัวไปข้างหน้าเล็กน้อย ถือดัมเบลห้อยลงด้านล่าง','กางแขนออกด้านข้างโดยศอกงอเล็กน้อย เน้นบีบไหล่หลัง','ลดแขนลงช้าๆ กลับสู่ท่าเริ่มต้น'], tip:'อย่าใช้แรงเหวี่ยงตัวช่วย ให้เคลื่อนไหวจากไหล่เท่านั้น'},
+    h4:{muscle:'กล้ามเนื้อคอบ่า (Traps)', steps:['ยืนถือดัมเบล/บาร์ข้างลำตัว แขนเหยียดตรง','ยกไหล่ขึ้นตรงๆ เหมือนพยายามแตะหู ค้าง 1 วิที่จุดสูงสุด','ลดไหล่ลงช้าๆ กลับสู่ท่าเริ่มต้น'], tip:'อย่าหมุนไหล่เป็นวงกลม ให้ยกขึ้น-ลงตรงๆ เท่านั้น'},
+    h5:{muscle:'หน้าท้องส่วนล่าง', steps:['ห้อยตัวจับบาร์ แขนเหยียดตรง ลำตัวนิ่ง','ยกขาขึ้นจนต้นขาตั้งฉากกับลำตัว (หรือสูงกว่าถ้าไหว)','ลดขาลงช้าๆ ควบคุม ไม่ปล่อยเหวี่ยง'], tip:'ถ้ายังไม่แข็งแรงพอ ให้เริ่มจากงอเข่าขึ้นแทนการเหยียดขาตรง'},
+    h6:{muscle:'หน้าท้องด้านข้าง (Obliques)', steps:['นั่งเอนตัวไปด้านหลังเล็กน้อย ยกเท้าลอยจากพื้น','ถือน้ำหนักเบาด้วยสองมือ บิดลำตัวไปด้านหนึ่ง','บิดกลับไปอีกด้านสลับกันไปตามจังหวะ'], tip:'เคลื่อนไหวช้าๆ ควบคุม ดีกว่าบิดเร็วแต่ไม่สุดช่วง'},
+
+    f1:{muscle:'สะโพก, หลังส่วนล่าง, ระบบหัวใจ', steps:['ยืนแยกเท้ากว้างกว่าไหล่เล็กน้อย ถือน้ำหนักด้วยสองมือด้านหน้า','ย่อสะโพกลงเล็กน้อยแล้วสะบัดสะโพกไปข้างหน้าให้น้ำหนักแกว่งขึ้น','ปล่อยให้น้ำหนักแกว่งกลับลงมาระหว่างขาแล้วทำซ้ำ'], tip:'แรงมาจากสะโพก ไม่ใช่การยกด้วยแขนหรือไหล่'},
+    f2:{muscle:'อก, ไทรเซ็ป, แกนกลาง', steps:['วางมือกว้างกว่าไหล่เล็กน้อย ลำตัวเป็นเส้นตรง','งอศอกลดตัวลงจนอกใกล้พื้น ศอกทำมุมประมาณ 45°','ดันตัวขึ้นกลับสู่ท่าเริ่มต้นโดยไม่ให้สะโพกยุบหรือยกสูง'], tip:'ถ้าทำท่าปกติไม่ไหว ให้ลงเข่าแตะพื้นแทนได้'},
+    f3:{muscle:'ต้นขาหน้า, สะโพก, แกนกลาง', steps:['ถือดัมเบลแนบชิดหน้าอกด้วยสองมือ','ย่อสะโพกลงแบบสควอท เข่าตามแนวปลายเท้า','ดันพื้นกลับขึ้นสู่ท่ายืน'], tip:'ศอกสามารถแตะด้านในของเข่าได้เล็กน้อยตอนลงต่ำสุด'},
+    f4:{muscle:'แกนกลาง, ระบบหัวใจ', steps:['อยู่ในท่าแพลงก์มือ ลำตัวเป็นเส้นตรง','ดึงเข่าข้างหนึ่งเข้าหาอกเร็วๆ แล้วสลับข้าง','ทำต่อเนื่องตามจังหวะโดยรักษาสะโพกให้นิ่ง'], tip:'อย่าให้สะโพกยกสูงขึ้น ให้ลำตัวคงเป็นเส้นตรงตลอด'},
+
+    s1:{muscle:'ไบเซ็ป + ไทรเซ็ป', steps:['ทำท่าไบเซ็ปเคิร์ลจนครบจำนวนครั้งโดยไม่พัก','ต่อด้วยท่าไทรเซ็ปดิป (ใช้ม้านั่งหรือบาร์คู่) ทันที','พักหลังทำครบทั้งสองท่าแล้วค่อยเริ่มเซ็ตถัดไป'], tip:'ซูเปอร์เซ็ตช่วยปั๊มเลือดเข้าแขนได้ดี เหมาะเป็นวันเสริมกล้ามแขน'},
+    s2:{muscle:'อกกลาง', steps:['ยืนกึ่งกลางเครื่องเคเบิล จับสายทั้งสองข้างระดับไหล่','ดึงสายไขว้กันมาบรรจบด้านหน้าลำตัว บีบอกที่จุดกึ่งกลาง','ปล่อยกลับช้าๆ จนรู้สึกยืดที่อก'], tip:'ก้าวขาหน้า-หลังเล็กน้อยเพื่อความมั่นคงระหว่างทำท่า'},
+    s3:{muscle:'หน้าท้องทั้งหมด', steps:['คุกเข่า จับที่จับล้อ Ab Wheel สองมือ','กลิ้งล้อไปข้างหน้าช้าๆ จนลำตัวเกือบขนานพื้น เกร็งหน้าท้องตลอด','ดึงกลับสู่ท่าเริ่มต้นโดยใช้แรงหน้าท้อง'], tip:'ถ้ายังไม่แข็งแรงพอ ให้ทำ Sit-up ธรรมดาแทนได้'},
+
+    u1:{muscle:'ต้นขาหน้า', steps:['นั่งบนเครื่อง วางหน้าแข้งใต้แท่นรอง ใช้น้ำหนักเบา','เหยียดขาขึ้นช้าๆ จนเกือบสุด','ลดขาลงช้าๆ ควบคุมจนกลับสู่ท่าเริ่มต้น'], tip:'วันนี้เน้นความรู้สึกและฟื้นฟูข้อเข่า ไม่ต้องใช้น้ำหนักมาก'},
+    u2:{muscle:'ก้น, ต้นขาหลัง', steps:['นอนหงาย งอเข่า วางเท้าราบกับพื้นแยกกว้างระดับสะโพก','ดันสะโพกขึ้นให้ลำตัวเป็นเส้นตรงจากไหล่ถึงเข่า บีบก้นค้าง 1 วิ','ลดสะโพกลงช้าๆ กลับสู่ท่าเริ่มต้น'], tip:'อย่าแอ่นหลังมากเกินไป ให้แรงมาจากการบีบก้นเป็นหลัก'},
+
+    fri_hiit:{muscle:'ระบบหัวใจและหลอดเลือด', steps:['วอร์มอัพเบาๆ 3-5 นาทีก่อนเริ่ม','สลับความหนัก: วิ่ง/ปั่นเร็ว 30 วิ ตามด้วยเดิน/ปั่นช้า 90 วิ','ทำวนซ้ำ 15-20 นาทีตามเวลาที่กำหนด'], tip:'ฟังร่างกายตัวเอง ถ้าหายใจไม่ทันให้ยืดเวลาช่วงเบาออกไปก่อน'}
+  };
+
+  function openExModal(rowEl){
+    const key = rowEl.dataset.key;
+    const nameEl = rowEl.querySelector('.ex-name');
+    const cueEl = rowEl.querySelector('.ex-cue');
+    const chip = rowEl.querySelector('.chip');
+    const chipRest = rowEl.querySelector('.chip-rest');
+
+    const iconEl = nameEl ? nameEl.querySelector('i') : null;
+    const iconClass = iconEl ? iconEl.className : 'bi bi-activity';
+    const nameText = nameEl ? nameEl.textContent.trim() : '';
+
+    document.getElementById('modalEmoji').innerHTML = '<i class="' + iconClass + '"></i>';
+    document.getElementById('modalName').textContent = nameText;
+    document.getElementById('modalSets').textContent = chip ? chip.textContent.trim() : '-';
+    document.getElementById('modalRest').textContent = chipRest ? (chipRest.textContent.replace('พัก','').trim() || '-') : '-';
+
+    const detail = exerciseDetails[key];
+    const stepsWrap = document.getElementById('modalSteps');
+    const tipWrap = document.getElementById('modalTip');
+
+    if(detail){
+      document.getElementById('modalMuscle').textContent = detail.muscle;
+      stepsWrap.innerHTML = detail.steps.map((s,i) => '<div class="step"><span class="step-num">' + (i+1) + '</span><span>' + s + '</span></div>').join('');
+      tipWrap.innerHTML = detail.tip ? '<div class="tip-line"><i class="bi bi-lightbulb-fill"></i> ' + detail.tip + '</div>' : '';
+    } else {
+      document.getElementById('modalMuscle').textContent = '';
+      stepsWrap.innerHTML = '<div class="step"><span class="step-num">1</span><span>' + (cueEl ? cueEl.textContent : '') + '</span></div>';
+      tipWrap.innerHTML = '';
+    }
+
+    document.getElementById('exModalOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function hideExModal(){
+    document.getElementById('exModalOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+</script>
+
+</body>
+</html>
